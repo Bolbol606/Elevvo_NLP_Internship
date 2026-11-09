@@ -1,0 +1,419 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+    <title>NLP & Tasks Dashboard</title>
+    <style>
+        :root {
+            box-sizing: border-box;
+            padding-top: env(safe-area-inset-top, 0px);
+            padding-bottom: env(safe-area-inset-bottom, 0px);
+            --bg: #f6f7f9;
+            --card: #fff;
+            --text: #1c2430;
+            --muted: #657084;
+            --line: #e1e5eb;
+            --accent: #3b6cf6;
+            --accent-soft: #e8eefe;
+            --ok: #1a8f55;
+            --err: #d23f3f;
+            --code: #0f1623;
+            --codetext: #d7e0f2;
+            color-scheme: light
+        }
+
+        @media (prefers-color-scheme:dark) {
+            :root:not([data-theme="light"]) {
+                --bg: #0f131a;
+                --card: #171c26;
+                --text: #e6eaf2;
+                --muted: #8d98ad;
+                --line: #262d3b;
+                --accent: #7a9cff;
+                --accent-soft: #1e2a4a;
+                --ok: #4cc58a;
+                --err: #ff7b7b;
+                --code: #0a0d13;
+                --codetext: #d7e0f2;
+                color-scheme: dark
+            }
+        }
+
+        :root[data-theme="dark"] {
+            --bg: #0f131a;
+            --card: #171c26;
+            --text: #e6eaf2;
+            --muted: #8d98ad;
+            --line: #262d3b;
+            --accent: #7a9cff;
+            --accent-soft: #1e2a4a;
+            --ok: #4cc58a;
+            --err: #ff7b7b;
+            --code: #0a0d13;
+            --codetext: #d7e0f2;
+            color-scheme: dark
+        }
+
+        * {
+            box-sizing: border-box
+        }
+
+        html {
+            scroll-padding-top: env(safe-area-inset-top, 0px)
+        }
+
+        body {
+            margin: 0;
+            background: var(--bg);
+            color: var(--text);
+            font: 15px/1.55 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif
+        }
+
+        header {
+            padding: 28px 20px 8px;
+            max-width: 980px;
+            margin: 0 auto
+        }
+
+        h1 {
+            margin: 0 0 4px;
+            font-size: 26px
+        }
+
+        header p {
+            margin: 0;
+            color: var(--muted)
+        }
+
+        nav {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            max-width: 980px;
+            margin: 16px auto 0;
+            padding: 0 20px
+        }
+
+        nav button {
+            border: 1px solid var(--line);
+            background: var(--card);
+            color: var(--text);
+            padding: 8px 14px;
+            border-radius: 999px;
+            cursor: pointer;
+            font: inherit;
+            font-size: 14px
+        }
+
+        nav button.on {
+            background: var(--accent);
+            border-color: var(--accent);
+            color: #fff
+        }
+
+        main {
+            max-width: 980px;
+            margin: 16px auto 40px;
+            padding: 0 20px;
+            display: grid;
+            gap: 16px
+        }
+
+        .card {
+            background: var(--card);
+            border: 1px solid var(--line);
+            border-radius: 14px;
+            padding: 18px
+        }
+
+        .card h2 {
+            margin: 0 0 4px;
+            font-size: 18px
+        }
+
+        .card h3 {
+            margin: 0 0 10px;
+            font-size: 13px;
+            text-transform: uppercase;
+            letter-spacing: .06em;
+            color: var(--muted)
+        }
+
+        .tags {
+            display: flex;
+            gap: 6px;
+            flex-wrap: wrap;
+            margin-top: 10px
+        }
+
+        .tag {
+            background: var(--accent-soft);
+            color: var(--accent);
+            padding: 2px 10px;
+            border-radius: 999px;
+            font-size: 12px
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 10px
+        }
+
+        .kv {
+            border: 1px solid var(--line);
+            border-radius: 10px;
+            padding: 10px
+        }
+
+        .kv b {
+            display: block;
+            font-size: 12px;
+            color: var(--muted);
+            font-weight: 500
+        }
+
+        .kv span {
+            font-family: ui-monospace, Menlo, monospace;
+            font-size: 14px
+        }
+
+        .steps {
+            list-style: none;
+            margin: 0;
+            padding: 0;
+            display: grid;
+            gap: 8px;
+            counter-reset: s
+        }
+
+        .steps li {
+            counter-increment: s;
+            display: flex;
+            gap: 10px;
+            align-items: flex-start
+        }
+
+        .steps li:before {
+            content: counter(s);
+            flex: none;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background: var(--accent-soft);
+            color: var(--accent);
+            font-size: 12px;
+            display: grid;
+            place-items: center;
+            margin-top: 1px
+        }
+
+        pre {
+            margin: 0;
+            background: var(--code);
+            color: var(--codetext);
+            padding: 14px;
+            border-radius: 10px;
+            overflow-x: auto;
+            font: 13px/1.5 ui-monospace, Menlo, monospace;
+            min-height: 60px;
+            white-space: pre-wrap
+        }
+
+        textarea {
+            width: 100%;
+            min-height: 110px;
+            background: var(--bg);
+            color: var(--text);
+            border: 1px solid var(--line);
+            border-radius: 10px;
+            padding: 10px;
+            font: 13px ui-monospace, Menlo, monospace
+        }
+
+        .btn {
+            background: var(--accent);
+            color: #fff;
+            border: 0;
+            padding: 8px 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            font: inherit;
+            font-size: 14px;
+            margin-top: 8px
+        }
+
+        .btn.ghost {
+            background: transparent;
+            color: var(--accent);
+            border: 1px solid var(--line);
+            margin-left: 6px
+        }
+
+        .note {
+            color: var(--muted);
+            font-size: 13px;
+            margin: 0 0 10px
+        }
+
+        .ok {
+            color: var(--ok)
+        }
+
+        .err {
+            color: var(--err)
+        }
+
+        .cm {
+            display: grid;
+            grid-template-columns: auto 1fr 1fr;
+            gap: 4px;
+            max-width: 340px;
+            font-size: 13px;
+            text-align: center
+        }
+
+        .cm div {
+            padding: 14px 6px;
+            border-radius: 8px;
+            background: var(--accent-soft);
+            color: var(--muted)
+        }
+
+        .cm .h {
+            background: none;
+            padding: 4px
+        }
+
+        .bars {
+            display: grid;
+            gap: 6px
+        }
+
+        .bar {
+            display: grid;
+            grid-template-columns: 90px 1fr;
+            gap: 8px;
+            align-items: center;
+            font-size: 13px
+        }
+
+        .bar i {
+            display: block;
+            height: 12px;
+            border-radius: 6px;
+            background: var(--accent);
+            opacity: .35
+        }
+
+        .theme {
+            position: absolute;
+            top: calc(12px + env(safe-area-inset-top, 0px));
+            right: 16px;
+            background: none;
+            border: 1px solid var(--line);
+            color: var(--text);
+            border-radius: 8px;
+            padding: 4px 10px;
+            cursor: pointer
+        }
+    </style>
+</head>
+
+<body>
+    <button class="theme" id="theme" aria-label="Toggle theme">◐</button>
+    <header>
+        <h1>NLP & SQL Tasks Dashboard</h1>
+        <p>Overview, settings, pipeline and results for four Python scripts.</p>
+    </header>
+    <nav id="nav"></nav>
+    <main id="main"></main>
+
+    <script>
+        const T = [
+            {
+                id: "t1", name: "1 · Sentiment", title: "Sentiment Analysis on IMDb Reviews", file: "task_1_sentiment_analysis.py",
+                desc: "Classifies movie reviews as positive or negative using TF-IDF features and Logistic Regression.",
+                tags: ["scikit-learn", "TF-IDF", "Logistic Regression", "Binary"],
+                params: { "max_features": "10,000", "ngram_range": "(1, 2)", "min_df": "2", "max_df": "0.95", "sublinear_tf": "True", "C": "1.0", "max_iter": "1000", "test split": "20%", "seed": "42" },
+                steps: ["Load IMDB Dataset.csv and show the first rows", "Clean text: strip HTML tags, keep letters only, lowercase", "Map sentiment to 0/1 and make a stratified 80/20 split", "Fit TF-IDF on the training set only (no leakage)", "Train Logistic Regression and report accuracy plus classification report", "Save confusion_matrix.png (counts and row percentages)"],
+                outputs: ["Accuracy and per-class precision/recall/F1", "confusion_matrix.png (300 dpi)"], viz: "cm",
+                hint: "Accuracy: 0.00%\n              precision    recall  f1-score ..."
+            },
+            {
+                id: "t2", name: "2 · News", title: "News Category Classifier (AG News)", file: "task_2_news_classification.py",
+                desc: "Four-class classifier (World, Sports, Business, Sci/Tech) with a TF-IDF + LinearSVC baseline, then tuned with GridSearchCV.",
+                tags: ["scikit-learn", "LinearSVC", "GridSearchCV", "4-class"],
+                params: { "baseline features": "15,000", "baseline ngrams": "(1, 2)", "baseline C": "1.0", "grid max_features": "5k, 10k", "grid ngram_range": "(1,1), (1,2)", "grid C": "0.1, 1, 5", "CV folds": "3", "fits": "12 × 3 = 36" },
+                steps: ["Load and merge every CSV in data/, normalizing column names", "Combine title and description into one text field", "Clean text (URLs and non-letters removed) and split 80/20", "Train baseline pipeline and print accuracy and report", "Run GridSearchCV over vocab size, n-grams and C", "Evaluate the best estimator on the held-out test set"],
+                outputs: ["Baseline accuracy and report", "Best parameters and CV accuracy", "Tuned test accuracy and report"], viz: "cats",
+                hint: "Baseline accuracy: ..\nBest parameters: {...}\nTuned test accuracy: .."
+            },
+            {
+                id: "t5", name: "5 · Topics", title: "Topic Modeling on BBC News (LDA)", file: "task_5_topic_modeling.py",
+                desc: "Discovers latent themes in BBC articles with Gensim LDA and exports an interactive pyLDAvis page. Falls back to scikit-learn LDA if Gensim is missing.",
+                tags: ["Gensim", "LDA", "pyLDAvis", "Unsupervised"],
+                params: { "num_topics": "5", "chunksize": "2000", "passes": "10", "iterations": "400", "alpha": "symmetric", "eta": "auto", "seed": "42", "filter_extremes": "no_below=3, no_above=0.6" },
+                steps: ["Load bbc-news-data.csv (tab-separated, with comma fallback)", "Tokenize with simple_preprocess and drop stopwords", "Build Dictionary and filter rare and very common words", "Convert documents to bag-of-words", "Train LdaModel and print top 10 words per topic", "Save bbc_lda_topics.html (pyLDAvis)"],
+                outputs: ["Top words for each of 5 topics", "bbc_lda_topics.html interactive map"], viz: "topics",
+                hint: "Topic 1: 0.012*\"word\" + ...\nTopic 2: ..."
+            },
+            {
+                id: "t10", name: "10 · SQL Agent", title: "Autonomous Text-to-SQL Agent (Chinook)", file: "task_10_sql_agent.py",
+                desc: "Runs SQL against the Chinook SQLite database and, when a query fails, sends the error and schema to an LLM to self-correct (up to 3 attempts).",
+                tags: ["LangChain", "SQLite", "GPT-4o-mini", "Self-correction"],
+                params: { "max_attempts": "3", "model": "gpt-4o-mini", "temperature": "0", "fallback LLM": "FakeListLLM", "fallback fixer": "singular/plural swap", "db": "Chinook_Sqlite.sqlite" },
+                steps: ["Connect via LangChain SQLDatabase (or sqlite3 wrapper)", "Set up the LLM and SQL toolkit", "Run the query; on error, grab the schema", "Send question, bad query, error and schema to the fixer", "Retry with the proposed fix until success or 3 attempts"],
+                outputs: ["Per-attempt log", "Final status, query, result and attempt count"], viz: "agent",
+                hint: "Attempt 1: ...\n  -> Success!"
+            }
+        ];
+        const $ = s => document.querySelector(s), nav = $("#nav"), main = $("#main");
+        const saved = {};
+        T.forEach((t, i) => { const b = document.createElement("button"); b.textContent = t.name; b.onclick = () => show(i); nav.appendChild(b) });
+
+        function viz(t) {
+            if (t.viz === "cm") return `<h3>Confusion matrix layout</h3><p class="note">Structure only. Run the script for real values.</p><div class="cm"><div class="h"></div><div class="h">Pred Neg</div><div class="h">Pred Pos</div><div class="h">Actual Neg</div><div>TN</div><div>FP</div><div class="h">Actual Pos</div><div>FN</div><div>TP</div></div>`;
+            if (t.viz === "cats") return `<h3>Target classes</h3><div class="bars">${["World", "Sports", "Business", "Sci/Tech"].map((c, i) => `<div class="bar"><span>${i + 1} · ${c}</span><i style="width:${60 + i * 0}%"></i></div>`).join("")}</div>`;
+            if (t.viz === "topics") return `<h3>Output</h3><p class="note">The script writes <code>bbc_lda_topics.html</code>. Open it in a browser next to this page for the interactive topic map.</p>`;
+            return `<h3>Try the self-correction loop</h3><p class="note">Simulates the script’s demo 2 using its heuristic fallback (Tracks → Track). No database is queried here.</p>
+ <pre id="log">Press “Run demo”.</pre><button class="btn" id="run">Run demo</button>`;
+        }
+        function show(i) {
+            [...nav.children].forEach((b, j) => b.classList.toggle("on", i === j));
+            const t = T[i];
+            main.innerHTML = `<section class="card"><h2>${t.title}</h2><div class="note">${t.file}</div><p>${t.desc}</p><div class="tags">${t.tags.map(x => `<span class="tag">${x}</span>`).join("")}</div></section>
+ <section class="card"><h3>Parameters</h3><div class="grid">${Object.entries(t.params).map(([k, v]) => `<div class="kv"><b>${k}</b><span>${v}</span></div>`).join("")}</div></section>
+ <section class="card"><h3>Pipeline</h3><ol class="steps">${t.steps.map(s => `<li>${s}</li>`).join("")}</ol></section>
+ <section class="card">${viz(t)}</section>
+ <section class="card"><h3>Your results</h3><p class="note">Expected output: ${t.outputs.join("; ")}. Paste your console output below to keep it with this page.</p>
+ <textarea id="paste" placeholder="${t.hint.replace(/"/g, "&quot;")}"></textarea><button class="btn" id="show">Show output</button><button class="btn ghost" id="clr">Clear</button><pre id="out" hidden></pre></section>`;
+            const ta = $("#paste"), out = $("#out");
+            const render = () => { if (saved[t.id]) { out.hidden = false; out.textContent = saved[t.id] } else out.hidden = true };
+            ta.value = saved[t.id] || ""; render();
+            $("#show").onclick = () => { saved[t.id] = ta.value.trim(); render() };
+            $("#clr").onclick = () => { saved[t.id] = ""; ta.value = ""; render() };
+            if (t.viz === "agent") $("#run").onclick = runDemo;
+        }
+        async function runDemo() {
+            const log = $("#log"), w = ms => new Promise(r => setTimeout(r, ms)); let s = "";
+            const add = async (l, c) => { s += (c ? `<span class="${c}">${l}</span>` : l) + "\n"; log.innerHTML = s; await w(450) };
+            log.innerHTML = "";
+            await add("Question: How many tracks are in the catalog?");
+            await add("Attempt 1: SELECT COUNT(*) AS total_tracks FROM Tracks;");
+            await add("  -> Error: no such table: Tracks", "err");
+            await add("  -> Sending error + schema to correction model...");
+            await add("  [Heuristic fix] Trying common singular/plural corrections...");
+            await add("  -> Proposed fix: SELECT COUNT(*) AS total_tracks FROM Track;");
+            await add("Attempt 2: SELECT COUNT(*) AS total_tracks FROM Track;");
+            await add("  -> Success!", "ok");
+            await add("Final outcome: status=ok, attempts=2", "ok");
+        }
+        $("#theme").onclick = () => { const r = document.documentElement, d = getComputedStyle(r).colorScheme === "dark"; r.dataset.theme = d ? "light" : "dark" };
+        show(0);
+    </script>
+</body>
+
+</html>
