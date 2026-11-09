@@ -1,0 +1,16 @@
+~/
+# 1. Hide the 6 unpublished tasks completely
+Level_2/Task_3_Fake_News/
+Level_2/Task_4_NER/
+Level_3/Task_6_Question_Answering/
+Level_3/Task_7_Text_Summarization/
+Level_4 (Industry_Level)/Task_8_RAG_Search_Engine/
+Level_4 (Industry_Level)/Task_9_FineTuning/
+
+# 2. Hide massive dataset files for the 4 tasks you ARE publishing 
+# (GitHub blocks pushes over 100MB, so never push raw CSVs or databases)
+data/
+*.csv
+*.sqlite
+*.db
+*.json
